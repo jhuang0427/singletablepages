@@ -53,8 +53,8 @@ class AppWeb extends \USDOJ\SingleTablePages\App {
             ->where("$uniqueColumn = :uuid")
             ->setParameter('uuid', $uuid);
 
-        $row = $query->execute()->fetch();
-
+        $row = $query->fetchAllAssociative();
+        
         if ($this->settings('require valid uuid') && empty($row)) {
             $this->pageNotFound();
         }
@@ -72,13 +72,13 @@ class AppWeb extends \USDOJ\SingleTablePages\App {
         if (file_exists($functionFile)) {
             include($functionFile);
             foreach ($functionList as $func) {
-                $twigFunctions[] = new \Twig_SimpleFunction($func, $func);
+                $twigFunctions[] = new \Twig\TwigFunction($func, $func);
             }
         }
         if (!empty($templateFolder) && file_exists($templateFolder)) {
 
-            $loader = new \Twig_Loader_Filesystem($templateFolder);
-            $this->twig = new \Twig_Environment($loader);
+            $loader = new \Twig\Loader\FilesystemLoader($templateFolder);
+            $this->twig = new \Twig\Environment($loader);
             foreach ($twigFunctions as $twigFunction) {
                 $this->twig->addFunction($twigFunction);
             }
@@ -105,7 +105,7 @@ class AppWeb extends \USDOJ\SingleTablePages\App {
      * @return array
      */
     public function getRow() {
-        return $this->row;
+        return $this->row[0];
     }
 
     /**
